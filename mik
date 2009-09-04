@@ -1,0 +1,4 @@
+#!/bin/sh
+KERNEL_VERSION=$1
+make -j4 bzImage && sudo make install && mkinitramfs -o initrd.img-$KERNEL_VERSION $KERNEL_VERSION && mv initrd.img-$KERNEL_VERSION /boot
+

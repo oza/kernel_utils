@@ -1,0 +1,52 @@
+#!/bin/sh
+KERNEL_VERSION=$1
+OUTPUT_DIR=/tmp/kernel-$KERNEL_VERSION/
+BOOT_DIR=$OUTPUT_DIR/boot
+MODULES_DIR=$OUTPUT_DIR/lib/modules
+FIRM_DIR=$OUTPUT_DIR/lib/firmware
+
+make_dirs()
+{
+	mkdir -p $BOOT_DIR
+	mkdir -p $MODULES_DIR
+	mkdir -p $FIRM_DIR
+}
+
+bind_dirs()
+{
+	sudo mount --bind $BOOT_DIR /boot
+	sudo mount --bind $MODULES_DIR /lib/modules
+	sudo mount --bind $FIRM_DIR /lib/firmware
+}
+
+make_and_install()
+{
+	make -j4 bzImage && make modules && sudo make modules_install && sudo make install && mkinitramfs -o initrd.img-$KERNEL_VERSION $KERNEL_VERSION && mv initrd.img-$KERNEL_VERSION /boot
+}
+
+create_archive()
+{
+	tar czvf kernel-$KERNEL_VERSION.tar.gz $OUTPUT_DIR
+}
+
+unbind_dirs()
+{
+	sudo umount /boot
+	sudo umount /lib/modules
+	sudo umount /lib/firmware
+}
+
+rm_dirs()
+{
+	rm -rf $OUTPUT_DIR
+}
+
+# start preparing
+make_dirs
+bind_dirs
+
+make_and_install
+create_archive
+
+unbind_dirs
+rm_dirs

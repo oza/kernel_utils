@@ -1,0 +1,4 @@
+#!/bin/sh
+time (make -j4 bzImage && make modules && sudo make install && sudo make modules_install && mkinitramfs -o initrd.img-2.6.30.5 2.6.30.5 && sudo mv initrd.img-2.6.30.5 /boot)
+
+
